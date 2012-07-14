@@ -34,6 +34,13 @@
 
             };
 
+            // wrap the element
+            if ( element ) {
+
+                element.css( 'float', 'left' )
+
+            }
+
             // create the input text box
             var text = $( '<input type="text" />')
                 .css( 'border', 'none')
@@ -59,9 +66,12 @@
                     if ( !element && next.length ) {
                         height_compare = next;
                     }
+                    height_compare = height_compare.children().first();
 
-                    var top = ( ( height_compare.height() - $this.height() ) / 2 );
-                    $this.css( 'top', top )
+                    var top = parseInt( height_compare.css( 'margin-top' ) ) + 
+                        ( ( height_compare.innerHeight() - $this.innerHeight() ) / 2 );
+                    
+                    $this.css( 'top', top + 'px' );
 
                     // create the blocks
                     var block_values = delimiter( val );
@@ -72,7 +82,7 @@
                         var block_value = block_values[ i ];
 
                         // create & insert the new block element
-                        after = make_block( block_fn( block_value ).css( 'float', 'left' ), block_value )
+                        after = make_block( block_fn( block_value ), block_value )
                                     .insertAfter( after );
 
                     }
