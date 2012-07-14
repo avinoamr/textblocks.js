@@ -7,15 +7,19 @@
 
     //
     jQuery.fn.textblocks = function( settings ) {
+
+        // apply to all elements
         var that = this;
         settings || ( settings = {} );
 
         //
-        var container = $( '<ul></ul>' )
+        var container = $( '<ul class="textblocks"></ul>' )
             .css( 'padding', '0' )
             .css( 'margin', '0' )
             .css( 'list-style', 'none')
             .appendTo( this );
+
+        this.append( $( '<div></div>' ).css( 'clear', 'both' ) );
 
         //
         var make_block = function( element, value ) {
@@ -31,7 +35,7 @@
             };
 
             // create the input text box
-            var text = $( '<input type="text" class="textblocks" />')
+            var text = $( '<input type="text" />')
                 .css( 'border', 'none')
                 .css( 'outline', 'none')
                 .css( 'width', '3px' )
@@ -74,7 +78,7 @@
 
                     // clear up the text boxes and focus on next text box
                     $this.val( '' );
-                    after.find( 'input.textblocks' )
+                    after.find( 'input' )
                         .val( block_values[ block_values.length - 1 ] )
                         .focus()
 
@@ -90,14 +94,14 @@
                         var prev = parent.prev(), val;
 
                         // remove previous (backspace)?
-                        if ( 8 == ev.keyCode ) {
-                            val = parent.attr( 'data-value' ) + parent.find( 'input.textblocks[ type="text" ]' ).val();
+                        if ( 8 == ev.keyCode && parent.siblings().length ) {
+                            val = parent.attr( 'data-value' ) + parent.find( 'input[ type="text" ]' ).val();
                             parent.detach();
                             ev.preventDefault();
                         }
 
                         // jump backwards
-                        var input = prev.find( 'input.textblocks[ type="text" ]' )
+                        var input = prev.find( 'input[ type="text" ]' )
 
                         val && ( input.val( input.val() + val ) );
                         input.focus();
@@ -116,7 +120,7 @@
                             next.detach();
                             $( this ).val( $( this ).val() + val ).focus();
                         } else {
-                            next.find( 'input.textblocks[ type="text" ]' )
+                            next.find( 'input[ type="text" ]' )
                                 .focus();
                         }
 
@@ -136,16 +140,15 @@
         };
 
         // first editing block
-        make_block( null )
-            .appendTo( container );
+        container.append( make_block() );
 
         // focus the last text box
         this.on( 'click', function( ev ) {
             if ( ev.target != that[ 0 ] ) return true;
-            container.find( 'input.textblocks[ type="text" ]' ).last().focus();
+            container.find( 'input[ type="text" ]' ).last().focus();
         });
 
-        return container;
+        return this;
 
     };
 
