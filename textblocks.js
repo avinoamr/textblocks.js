@@ -60,7 +60,7 @@
                         height_compare = next;
                     }
 
-                    var top = Math.round( ( ( height_compare.height() - $this.height() ) / 2 ) ) - 1;
+                    var top = ( ( height_compare.height() - $this.height() ) / 2 );
                     $this.css( 'top', top )
 
                     // create the blocks
