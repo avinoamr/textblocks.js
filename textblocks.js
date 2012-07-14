@@ -25,7 +25,7 @@
         var make_block = function( element, value ) {
 
             // block handling function
-            var fn = settings.fn || function( block ) { return $( '<span>' + block + '</span>' ) };
+            var block_fn = settings.block || function( text ) { return $( '<span>' + text + '</span>' ) };
 
             // TODO: add support for a delimiter function (default delimiter is a simple split)
             var delimiter = ( 'function' == typeof settings.delimiter ) ? settings.delimiter : function( text ) {
@@ -59,7 +59,8 @@
                     if ( !element && next.length ) {
                         height_compare = next;
                     }
-                    var top = ( ( height_compare.height() - $this.height() ) / 2 ) - 1;
+
+                    var top = Math.round( ( ( height_compare.height() - $this.height() ) / 2 ) ) - 1;
                     $this.css( 'top', top )
 
                     // create the blocks
@@ -71,7 +72,7 @@
                         var block_value = block_values[ i ];
 
                         // create & insert the new block element
-                        after = make_block( fn( block_value ).css( 'float', 'left' ), block_value )
+                        after = make_block( block_fn( block_value ).css( 'float', 'left' ), block_value )
                                     .insertAfter( after );
 
                     }

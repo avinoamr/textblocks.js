@@ -46,4 +46,4 @@ $( '#container' ).textblocks( settings );
 
 1. **delimiter**: A character you want to break the text by into blocks. Alternatively, you can create your own function here that will receive the input text as its only argument, and should return an array of the text splitted as you'd like.
 
-2. **fn**: A function for converting the input block text from the `delimiter` function to an HTML element. It receives the block text, and should return a DOM object (created with `document.createElement` or jQuery's `$()`). 
+2. **block**: A function for converting the input block text from the `delimiter` function to an HTML element. It receives the block text, and should return a DOM object (created with `document.createElement` or jQuery's `$()`). 
