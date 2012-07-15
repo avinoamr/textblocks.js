@@ -70,26 +70,28 @@
 
                     var top = parseInt( height_compare.css( 'margin-top' ) ) + 
                         ( ( height_compare.innerHeight() - $this.innerHeight() ) / 2 );
-                    
+
                     $this.css( 'top', top + 'px' );
 
                     // create the blocks
                     var block_values = delimiter( val );
                     if ( 1 >= block_values.length ) return; // no delimiter found, no changes require.
 
-                    var after = parent;
-                    for ( var i = 0 ; i < block_values.length - 1 ; i ++ ) {
+                    var before = parent, first;
+                    for ( var i = block_values.length - 2 ; i >= 0  ; i -- ) {
                         var block_value = block_values[ i ];
 
                         // create & insert the new block element
-                        after = make_block( block_fn( block_value ), block_value )
-                                    .insertAfter( after );
+                        before = make_block( block_fn( block_value ), block_value )
+                                    .insertBefore( before );
+
+                        !first && ( first = before );
 
                     }
 
                     // clear up the text boxes and focus on next text box
                     $this.val( '' );
-                    after.find( 'input' )
+                    first.next().find( 'input' )
                         .val( block_values[ block_values.length - 1 ] )
                         .focus()
 
@@ -106,15 +108,17 @@
 
                         // remove previous (backspace)?
                         if ( 8 == ev.keyCode && parent.siblings().length ) {
-                            val = parent.attr( 'data-value' ) + parent.find( 'input[ type="text" ]' ).val();
-                            parent.detach();
+
+                            val = parent.prev().attr( 'data-value' ); // + parent.find( 'input[ type="text" ]' ).val();
+                            parent.prev().detach();
                             ev.preventDefault();
+
                         }
 
                         // jump backwards
-                        var input = prev.find( 'input[ type="text" ]' )
-
-                        val && ( input.val( input.val() + val ) );
+                        var input = parent.find( 'input[ type="text" ]' )
+                        val && ( input.val( val + input.val() ) );
+                        
                         input.focus();
 
                     }
@@ -145,8 +149,8 @@
                 .attr( 'data-value', value )
                 .css( 'float', 'left' )
                 .css( 'display', 'inline' )
-                .append( element )
-                .append( text );
+                .append( text )
+                .append( element );
 
         };
 
