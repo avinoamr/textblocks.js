@@ -85,6 +85,7 @@
 
                     var $this = $( this );
                     var parent = $this.parent();
+                    var prev = parent.prev();
                     var val = $this.val();
 
                     // dynamic width
@@ -93,14 +94,8 @@
 
                     // dynamic position
                     var height_compare = parent;
-                    if ( height_compare.prev().length ) {
-                        height_compare = height_compare.prev().first();
-                        console.log( 'prev' );
-                    } else if ( height_compare.next().length ) {
-                        height_compare = height_compare.next().first();
-                        console.log( 'next' );
-                    } else {
-                        console.log( 'parent' );
+                    if ( prev.length ) {
+                        height_compare = prev;
                     }
                     height_compare = height_compare.children().last();
 
