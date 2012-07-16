@@ -99,10 +99,10 @@
                     }
                     height_compare = height_compare.children().last();
 
-                    var top = parseInt( height_compare.css( 'margin-top' ) ) + 
-                        ( ( height_compare.innerHeight() - $this.innerHeight() ) / 2 );
+                    var top = parseInt( height_compare.css( 'margin-top' ) ) /* + 
+                        ( ( height_compare.innerHeight() - $this.innerHeight() ) / 2 );*/
 
-                    $this.css( 'top', top + 'px' );
+                    $this.css( 'margin-top', top + 'px' );
 
                     // create the blocks
                     var block_values = delimiter( val );
