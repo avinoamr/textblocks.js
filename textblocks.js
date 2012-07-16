@@ -161,6 +161,12 @@
 
                         var parent = $this.parent();
                         var prev = parent.prev();
+
+                        // skip if this is the first block
+                        if ( !prev.length ) {
+                            return;
+                        }
+
                         prev.detach(); // remove the previous block
 
                         // read the values of the removed text box, block and the current input box
@@ -183,6 +189,12 @@
 
                         var parent = $this.parent();
                         var next = parent.next();
+
+                        // skip if this is the last block
+                        if ( !next.length ) {
+                            return;
+                        }
+
                         parent.detach(); // remove this block (practically the next)
 
                         // read the values of the removed text box, block and the next input box
