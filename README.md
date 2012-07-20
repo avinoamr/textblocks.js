@@ -41,12 +41,14 @@ The example above is obviously not useful for anything, it just creates a dumb i
 ```javascript
 $( '#container' ).textblocks(function( val, ev ) {
 
-  return $( '<div>' + val + '<div>' );
+  return $( '<div>' + val + '<div>' ).val( val );
 
 });
 ```
 
 This function will be triggered whenever any text is inserted to the text box, passing in the value and the event that caused the change. The return value of this function is one or more (an array) DOM elements to the newly created blocks
+
+Note that the new block was assaigned the relevant value with jQuery's `.val()` method. This is important in order to reverse the block operation (with backspace or delete), and for extracting its value in the future. If you omit it, the value of the element will be evaluated to an empty string which may, or may not, be the desired behavior
 
 ## CSS
 
