@@ -34,16 +34,22 @@ $( '#container' ).textblocks();
 
 That's pretty much it, for now.
 
-## Settings
+## Generator Method
 
-The example above is obviously not useful for anything. In order to get the most out of `textblocks`, you'll need to customize it for your needs:
+The example above is obviously not useful for anything, it just creates a dumb input text box in a similar way to just creating in manually. In order to get the most out of `textblocks`, you'll need to customize the block generation process for your needs. This is done by passing a generator function to the textblocks element:
 
 ```javascript
-$( '#container' ).textblocks( settings );
+$( '#container' ).textblocks(function( val, ev ) {
+
+  return $( '<div>' + val + '<div>' );
+
+});
 ```
 
-`settings` is an object with the following parameters:
+This function will be triggered whenever any text is inserted to the text box, passing in the value and the event that caused the change. The return value of this function is one or more (an array) DOM elements to the newly created blocks
 
-1. **delimiter**: A character you want to break the text by into blocks. Alternatively, you can create your own function here that will receive the input text as its only argument, and should return an array of the text splitted as you'd like.
+## CSS
 
-2. **block**: A function for converting the input block text from the `delimiter` function to an HTML element. It receives the block text, and should return a DOM object (created with `document.createElement` or jQuery's `$()`). 
+`textblocks` makes no assumptions about the CSS style settings of your page. As such, if no fancy CSS is used, `textblocks` will work out of the box. However, most CSS changes will also affect the look and feel of the `textblocks` component. This is actually a feature that allows you to customize the inner parts of `textblocks` to match the visual requirements of your application.
+
+You can target `textblocks` elements with the `ul.textblocks` selection and then traverse and manipulation the children tree with CSS or javascript.
