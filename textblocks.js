@@ -53,6 +53,7 @@
         ( generator_fn ) || ( generator_fn = function() {} );
 
         //
+        var default_val = this.val();
         var container = $( '<ul class="textblocks" />' )
             .appendTo( this );
 
@@ -209,11 +210,9 @@
 
                 });
 
-            var li = $( '<li />' )
+            return $( '<li />' )
                 .append( text )
                 .append( element );
-
-            return li;
 
         };
 
@@ -221,7 +220,7 @@
         container.append( make_block() );
 
         // default value
-        container.find( 'input' ).val( this.attr( 'data-value' ) ).trigger( 'input.textblocks' );
+        container.find( 'input' ).val( default_val ).trigger( 'input.textblocks' );
 
         // focus the last text box
         this.on( 'click', function( ev ) {
@@ -234,13 +233,61 @@
     };
 
     // create the style
-    $( 
-        '<style>' + 
+    $(  '<style>' + 
             'ul.textblocks { padding: 0; margin: 0; list-style: none; }' +
             'ul.textblocks > li { float: left; display: inline; }' + 
             'ul.textblocks > li > input { border: none; outline: none; float: left; } ' + 
         '</style>' 
     ).appendTo( $( 'head' ) );
+
+    // proxy to jQuery's val() method to allow a different implementation for the textblocks elements
+    var val_fn = function( val ) {
+
+        var textblocks = this.children( 'ul.textblocks' ).first();
+
+        if ( 0 == arguments.length ) {
+            
+            var values = [];
+            textblocks.children( 'li' ).each(function() {
+
+                var $this = $( this );
+                var text_val = $this.children( 'input' ).val();
+                var block_val = $this.children( 'span' ).children().first().val();
+                
+                if ( text_val ) {
+                    values.push( text_val );
+                }
+                if ( block_val ) {
+                    values.push( block_val );
+                }
+
+            });
+
+            return values;
+
+        } else {
+            
+            textblocks.children( 'li' )
+                .slice( 0, -1 )
+                .remove();
+
+            textblocks.find( 'input' )
+                .val( val )
+                .trigger( 'input.textblocks' );
+
+            return this;
+        }
+
+    };
+
+    var jquery_val = $.fn.val;
+    $.fn.val = function( val ) {
+
+        var textblocks = this.children( 'ul.textblocks' );
+        var fn = ( textblocks.length ) ? val_fn : jquery_val;
+        return fn.apply( this, arguments );
+
+    }
 
 })( jQuery );
 

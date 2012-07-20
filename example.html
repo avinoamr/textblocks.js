@@ -36,7 +36,7 @@
     </head>
     <body>
 
-        <div id="container" data-value="text,blocks,awesome,tags,">
+        <div id="container">
             <span>Type a comma-separated list of tags</span>
         </div>
 
@@ -45,23 +45,26 @@
 
         <script>
 
-            $( '#container' ).textblocks(function( text ) {
+            $( '#container' )
 
-                var comps = text.split( ',' );
+                .val( 'text,blocks,awesome,tags,' )
+                .textblocks(function( text ) {
 
-                if ( comps.length == 1 ) {
-                    return; // change nothing
-                }
+                    var comps = text.split( ',' );
 
-                var blocks = [];
-                for ( var i = 0 ; i < comps.length - 1 ; i ++ ) {
-                    blocks.push( $( '<span class="tag">' + comps[ i ] + '</span>' ).val( comps[ i ] ) );
-                }  
-                blocks.push( comps[ comps.length - 1 ] );
+                    if ( comps.length == 1 ) {
+                        return; // change nothing
+                    }
 
-                return blocks;
+                    var blocks = [];
+                    for ( var i = 0 ; i < comps.length - 1 ; i ++ ) {
+                        blocks.push( $( '<span class="tag">' + comps[ i ] + '</span>' ).val( comps[ i ] ) );
+                    }  
+                    blocks.push( comps[ comps.length - 1 ] );
 
-            });
+                    return blocks;
+
+                });
 
         </script>
     </body>
