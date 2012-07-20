@@ -54,4 +54,4 @@ Note that the new block was assaigned the relevant value with jQuery's `.val()` 
 
 `textblocks` makes no assumptions about the CSS style settings of your page. As such, if no fancy CSS is used, `textblocks` will work out of the box. However, most CSS changes will also affect the look and feel of the `textblocks` component. This is actually a feature that allows you to customize the inner parts of `textblocks` to match the visual requirements of your application.
 
-You can target `textblocks` elements with the `ul.textblocks` selection and then traverse and manipulation the children tree with CSS or javascript.
+You can target `textblocks` elements with the `ul.textblocks` selector and then traverse and manipulation the children tree with CSS or javascript.
