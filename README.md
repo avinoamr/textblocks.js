@@ -36,7 +36,7 @@ That's pretty much it, for now.
 
 ## Generator
 
-The example above is obviously not useful for anything, it just creates a dumb input text box in a similar way to just creating in manually. In order to get the most out of `textblocks`, you'll need to customize the block generation process for your needs. This is done by passing a generator function to the textblocks element:
+The example above is obviously not useful for anything, it just creates a dumb input text box in a similar way to just creating it manually. In order to get the most out of `textblocks`, you'll need to customize the block generation process for your needs. This is done by passing a generator function to the textblocks element:
 
 ```javascript
 $( '#container' ).textblocks(function( val, ev ) {
