@@ -50,6 +50,17 @@ This function will be triggered whenever any text is inserted to the text box, p
 
 Note that the new block was assaigned the relevant value with jQuery's `.val()` method. This is important in order to reverse the block operation (with backspace or delete), and for extracting its value in the future. If you omit it, the value of the element will be evaluated to an empty string which may, or may not, be the desired behavior
 
+## Default Value
+
+You can set the default value of the `textblocks` component in two ways:
+
+1. Programmatically find the input text block and change it's value.
+2. Set a `data-value` attribute on your container:
+
+```html
+<div id="container" data-value="Some Default Value"></div>
+```
+
 ## CSS
 
 `textblocks` makes no assumptions about the CSS style settings of your page. As such, if no fancy CSS is used, `textblocks` will work out of the box. However, most CSS changes will also affect the look and feel of the `textblocks` component. This is actually a feature that allows you to customize the inner parts of `textblocks` to match the visual requirements of your application.
