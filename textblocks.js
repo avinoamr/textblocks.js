@@ -44,26 +44,6 @@
         KEY_DELETE = 46;
 
     //
-    var auto_size = function( ele ) {
-
-        // dynamic width
-        // TODO: Make it smarter. Set the value into a temporary text field, set its 'size' attribute and then read the width attribute
-        // var tmp = ele.clone( false )
-        //     //.hide()
-        //     .css( 'width', 'auto' )
-        //     .attr( 'size', ele.val().length )
-        //     .insertAfter( ele );
-
-        ele.attr( 'size', ele.val().length );
-        
-        // console.log( tmp.width() );
-
-        // ele.css( 'width', tmp.width() );
-        //tmp.detach();
-
-    };
-
-    //
     jQuery.fn.textblocks = function( generator_fn ) {
 
         // apply to all elements
