@@ -50,8 +50,7 @@ This function will be triggered whenever any text is inserted to the text box, p
 
 Note that the new block was assaigned the relevant value with jQuery's `.val()` method. This is important in order to reverse the block operation (with backspace or delete), and for extracting its value in the future. If you omit it, the value of the element will be evaluated to an empty string which may, or may not, be the desired behavior
 
-# Note on performance
-The way `textblocks` works is that whenever an input field is modified (by typing in text, changing focus, etc.) your generators function is called in order to determine if any blocks should be created. This means that the performance of your generator is the most major factor in the overall performance of `textblocks`. A best practice is to nalways check if any blocks should be created first, and fast (avoid complex text comparisons), and return null if nothing should be created. Otherwise, do your fancy calculations.
+**Note on performance**: The way `textblocks` works is that whenever an input field is modified (by typing in text, changing focus, etc.) your generators function is called in order to determine if any blocks should be created. This means that the performance of your generator is the most major factor in the overall performance of `textblocks`. A best practice is to nalways check if any blocks should be created first, and fast (avoid complex text comparisons), and return null if nothing should be created. Otherwise, do your fancy calculations.
 
 ## Default Value
 
