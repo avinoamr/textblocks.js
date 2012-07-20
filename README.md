@@ -15,7 +15,7 @@ This library allows you to control the behavior and display of how the user inpu
 
 **Note**: It's sometimes easier to learn by example, intead of using the documenation presented here. `textblocks` includes a simple `example.html` file that demonstrates all of the principles presented here. You're advised to go over its code.
 
-First, include download the `textblocks.js` file and include it in your HTML application. Also, `textblocks.js` is a essentially a jQuery plugin, and therefor depends on it. Make sure to include jQuery as well:
+First, download the `textblocks.js` file and include it in your HTML application. `textblocks.js` is a essentially a jQuery plugin, and therefor depends on it. Make sure to include jQuery as well:
 
 ```html
 <script type="text/javascript" src="jquery-1.7.2.js"></script>
