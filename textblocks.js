@@ -4,6 +4,13 @@
  * Customized text box input for interactive UI experiences
  * https://github.com/avinoamr/textblocks.js
  *
+ * TODO
+ *   1. Support range selection across multiple blocks, plus Ctrl+A
+ *
+ * THANKS
+ *   Rangy Text Inputs (MIT License) by Tim Down (http://code.google.com/p/rangy/)
+ *   jQuery autoGrow plugin (https://github.com/rkivalin/jquery-autogrow)
+ *
  * The MIT License
  * 
  * Copyright (c) 2010-2012 Roi Avinoam <avinoamr@gmail.com> and jquery-selection authors.
@@ -26,7 +33,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * Uses: Rangy Text Inputs (MIT License) by Tim Down (http://code.google.com/p/rangy/). See below.
+ * Uses: . See below.
  */
 (function( $ ) {
 
@@ -37,94 +44,100 @@
         KEY_DELETE = 46;
 
     //
-    jQuery.fn.textblocks = function( settings ) {
+    var auto_size = function( ele ) {
+
+        // dynamic width
+        // TODO: Make it smarter. Set the value into a temporary text field, set its 'size' attribute and then read the width attribute
+        // var tmp = ele.clone( false )
+        //     //.hide()
+        //     .css( 'width', 'auto' )
+        //     .attr( 'size', ele.val().length )
+        //     .insertAfter( ele );
+
+        ele.attr( 'size', ele.val().length );
+        
+        // console.log( tmp.width() );
+
+        // ele.css( 'width', tmp.width() );
+        //tmp.detach();
+
+    };
+
+    //
+    jQuery.fn.textblocks = function( generator_fn ) {
 
         // apply to all elements
         var that = this;
-        settings || ( settings = {} );
+
+        // default generator (dumb text box)
+        ( generator_fn ) || ( generator_fn = function() {} );
 
         //
-        var container = $( '<ul class="textblocks"></ul>' )
-            .css( 'padding', '0' )
-            .css( 'margin', '0' )
-            .css( 'list-style', 'none')
+        var container = $( '<ul class="textblocks" />' )
             .appendTo( this );
 
-        this.append( $( '<div></div>' ).css( 'clear', 'both' ) );
+        this.append( $( '<div />' ).css( 'clear', 'both' ).hide() )
 
         //
-        var make_block = function( element, value ) {
-
-            // block handling function
-            var block_fn = settings.block || function( text ) { return $( '<span>' + text + '</span>' ) };
-
-            // TODO: add support for a delimiter function (default delimiter is a simple split)
-            var delimiter = ( 'function' == typeof settings.delimiter ) ? settings.delimiter : function( text ) {
-
-                return text.split( settings.delimiter || ' ' );
-
-            };
+        var make_block = function( element ) {
 
             // wrap the element
             if ( element ) {
 
-                element.css( 'float', 'left' )
+                element = $( '<span />')
+                    .css( 'float', 'left' )
+                    .append( element );
 
             }
 
             // create the input text box
+            var autogrow = false;
             var text = $( '<input type="text" />')
-                .css( 'border', 'none')
-                .css( 'outline', 'none')
                 .css( 'width', '3px' )
-                .css( 'float', 'left' )
-                .css( 'position', 'relative' )
+                .css( 'min-width', '3px' )
 
                 // handle changes to the text input
-                .on( 'input change blur focus', function() {
+                .on( 'input change blur focus', function( ev ) {
 
                     var $this = $( this );
                     var parent = $this.parent();
                     var prev = parent.prev();
                     var val = $this.val();
 
-                    // dynamic width
-                    // TODO: Make it smarter. Set the value into a temporary text field, set its 'size' attribute and then read the width attribute
-                    $this.css( 'width', ( 3 + ( 13 * val.length ) ) );
+                    autogrow = ( autogrow ) ? autogrow.trigger( 'input.autogrow' ) : $this.autoGrow( 3 );
 
-                    // dynamic position
-                    var height_compare = parent;
-                    if ( prev.length ) {
-                        height_compare = prev;
+                    // generate the new blocks
+                    var blocks = generator_fn( val, ev );
+                    if ( !blocks ) {
+                        return; // no blocks created, change nothing
                     }
-                    height_compare = height_compare.children().last();
+                    ( !$.isArray( blocks ) ) && ( blocks = [ blocks ] );
 
-                    var top = parseInt( height_compare.css( 'margin-top' ) ) /* + 
-                        ( ( height_compare.innerHeight() - $this.innerHeight() ) / 2 );*/
+                    // inject the blocks to the blocks list
+                    var val = '', current;
+                    for ( var i = 0 ; i < blocks.length ; i ++ ) {
 
-                    $this.css( 'margin-top', top + 'px' );
+                        var block = blocks[ i ];
+                        if ( "string" == typeof block || "number" == typeof block ) {
 
-                    // create the blocks
-                    var block_values = delimiter( val );
-                    if ( 1 >= block_values.length ) return; // no delimiter found, no changes require.
+                            val += block;
 
-                    var before = parent, first;
-                    for ( var i = block_values.length - 2 ; i >= 0  ; i -- ) {
-                        var block_value = block_values[ i ];
+                        } else {
 
-                        // create & insert the new block element
-                        before = make_block( block_fn( block_value ), block_value )
-                                    .insertBefore( before );
+                            block = make_block( block );
+                            current = ( current ) ? block.insertAfter( current ) : block.insertBefore( parent );
 
-                        !first && ( first = before );
+                            var input = current.find( 'input' ).val( val );
+                            auto_size( input );
+
+                            val = '';
+
+                        }
 
                     }
 
-                    // clear up the text boxes and focus on next text box
-                    $this.val( '' );
-                    first.next().find( 'input' )
-                        .val( block_values[ block_values.length - 1 ] )
-                        .focus()
+                    // excess string blocks
+                    $this.val( val ).focus();
 
                 })
 
@@ -144,7 +157,7 @@
                     if ( 0 == cursor && KEY_LEFT == ev.keyCode ) {
 
                         // find and focus on text input box of the previous block
-                        $this.parent().prev().find( 'input[ type="text" ]' ).focus();
+                        $this.parent().prev().find( 'input' ).focus();
 
                     }
 
@@ -152,12 +165,14 @@
                     if ( end == cursor && KEY_RIGHT == ev.keyCode ) {
 
                         // find and focus on the text input box of the next block
-                        $this.parent().next().find( 'input[ type="text" ]' ).focus();
+                        $this.parent().next().find( 'input' ).focus();
 
                     }
 
                     // remove the previous block (backspace)
                     if ( 0 == cursor && KEY_BACKSPACE == ev.keyCode ) {
+
+                        ev.preventDefault(); // this backspace shouldn't remove any characters
 
                         var parent = $this.parent();
                         var prev = parent.prev();
@@ -170,9 +185,9 @@
                         prev.detach(); // remove the previous block
 
                         // read the values of the removed text box, block and the current input box
-                        var text_val = prev.find( 'input[ type="text" ]' ).val();
-                        var val = prev.attr( 'data-value' );
-                        var input = parent.find( 'input[ type="text" ]' );
+                        var text_val = prev.find( 'input' ).val();
+                        var val = prev.find( 'input' ).siblings( 'span' ).children().first().val();
+                        var input = parent.find( 'input' );
 
                         // set the input value of the current block
                         input
@@ -180,12 +195,12 @@
                             .setSelection( text_val.length + val.length, text_val.length + val.length )
                             .focus();
 
-                        ev.preventDefault(); // this backspace shouldn't remove any characters
-
                     }
 
                     // remove the next block (delete)
                     if ( end == cursor && KEY_DELETE == ev.keyCode ) {
+
+                        ev.preventDefault(); // this delete shouldn't remove any characters
 
                         var parent = $this.parent();
                         var next = parent.next();
@@ -199,8 +214,8 @@
 
                         // read the values of the removed text box, block and the next input box
                         var text_val = $this.val();
-                        var val = parent.attr( 'data-value' );
-                        var input = next.find( 'input[ type="text" ]' );
+                        var val = parent.find( 'input' ).siblings( 'span' ).children().first().val();
+                        var input = next.find( 'input' );
 
                         // set the input value of the next block
                         input
@@ -208,18 +223,15 @@
                             .setSelection( text_val.length, text_val.length )
                             .focus();
 
-                        ev.preventDefault(); // this delete shouldn't remove any characters
-
                     }
 
                 });
 
-            return $( '<li></li>' )
-                .attr( 'data-value', value )
-                .css( 'float', 'left' )
-                .css( 'display', 'inline' )
+            var li = $( '<li />' )
                 .append( text )
                 .append( element );
+
+            return li;
 
         };
 
@@ -229,15 +241,29 @@
         // focus the last text box
         this.on( 'click', function( ev ) {
             if ( ev.target != that[ 0 ] ) return true;
-            container.find( 'input[ type="text" ]' ).last().focus();
+            container.find( 'input' ).last().focus();
         });
 
         return this;
 
     };
 
+    // create the style
+    $( 
+        '<style>' + 
+            'ul.textblocks { padding: 0; margin: 0; list-style: none; }' +
+            'ul.textblocks > li { float: left; display: inline; }' + 
+            'ul.textblocks > li > input { border: none; outline: none; float: left; } ' + 
+        '</style>' 
+    ).appendTo( $( 'head' ) );
+
 })( jQuery );
 
+/**
+ * jQuery autoGrow extension by Roman Kivalin (https://github.com/rkivalin)
+ * https://github.com/rkivalin/jquery-autogrow
+ */
+(function(){(function(a){var b;return b=["font","letter-spacing"],a.fn.autoGrow=function(c){var d,e,f;return e=c==="remove"||c===!1||(c!=null?!!c.remove:!!void 0),d=(f=c!=null?c.comfortZone:void 0)!=null?f:c,d!=null&&(d=+d),this.each(function(){var c,f,g,h,i,j,k,l,m,n;g=a(this),j=g.next().filter("pre.autogrow");if(j.length&&e)return g.unbind("input.autogrow"),j.remove();if(j.length){i={};for(k=0,m=b.length;k<m;k++)h=b[k],i[h]=g.css(h);j.css(i);if(d!=null)return c=function(){return j.text(g.val()),g.width(j.width()+d)},g.unbind("input.autogrow"),g.bind("input.autogrow",c),c()}else if(!e){g.css("min-width")==="0px"&&g.css("min-width",""+g.width()+"px"),i={position:"absolute",top:-99999,left:-99999,width:"auto",visibility:"hidden"};for(l=0,n=b.length;l<n;l++)h=b[l],i[h]=g.css(h);return j=a('<pre class="autogrow"/>').css(i),j.insertAfter(g),f=d!=null?d:70,c=function(){return j.text(g.val()),g.width(j.width()+f)},g.bind("input.autogrow",c),c()}})}})(typeof Zepto!="undefined"&&Zepto!==null?Zepto:jQuery)}).call(this);
 
 /*
  Rangy Text Inputs, a cross-browser textarea and text input library plug-in for jQuery.

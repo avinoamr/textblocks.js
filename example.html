@@ -49,13 +49,22 @@
 
         <script>
 
-            $( '#container' ).textblocks({
-                block: function( block ) {
+            $( '#container' ).textblocks(function( text ) {
 
-                    var color = [ 'blue', 'red', 'green', 'yellow', 'silver' ][ Math.floor( Math.random() * 5 ) ];
-                    return $( '<span class="tag silver">' + block + '</span>' );
+                var comps = text.split( ',' );
 
+                if ( comps.length == 1 ) {
+                    return; // change nothing
                 }
+
+                var blocks = [];
+                for ( var i = 0 ; i < comps.length - 1 ; i ++ ) {
+                    blocks.push( $( '<span class="tag silver">' + comps[ i ] + '</span>' ).val( comps[ i ] ) );
+                }  
+                blocks.push( comps[ comps.length - 1 ] );
+
+                return blocks;
+
             });
 
         </script>
