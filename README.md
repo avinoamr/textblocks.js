@@ -52,16 +52,28 @@ Note that the new block was assaigned the relevant value with jQuery's `.val()` 
 
 **Note on performance**: The way `textblocks` works is that whenever an input field is modified (by typing in text, changing focus, etc.) your generators function is called in order to determine if any blocks should be created. This means that the performance of your generator is the most major factor in the overall performance of `textblocks`. A best practice is to nalways check if any blocks should be created first, and fast (avoid complex text comparisons), and return null if nothing should be created. Otherwise, do your fancy calculations.
 
-## Default Value
+## Reading and Writing the value
 
-You can set the default value of the `textblocks` component in two ways:
+In order to set the value of the textblocks element use jQuery's `.val()` method on your container:
 
-1. Programmatically find the input text block and change it's value.
-2. Set a `data-value` attribute on your container:
-
-```html
-<div id="container" data-value="Some Default Value"></div>
+```javascript
+$( '#container' ).val( 'Some New Value' ).textblocks( fn );
 ```
+
+You can also use this command after the initialization of the `textblocks` element:
+
+```javascript
+$( '#container' ).textblocks( fn ).val( 'Some New Value');
+```
+
+Similarily, you can read the all of the `textblocks` values by using `.val()`:
+
+```javascript
+$( '#container' ).val(); // returns an array with all of the input and block values of this textblocks element
+```
+
+Note that in order for your blocks to have a value assigned to them, you must use jQuery's `.val()` method on your generated blocks during their creation. See the *Generator* documentation above.
+
 
 ## CSS
 
