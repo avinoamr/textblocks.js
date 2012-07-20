@@ -77,7 +77,7 @@
                 .css( 'min-width', '3px' )
 
                 // handle changes to the text input
-                .on( 'input change blur focus', function( ev ) {
+                .on( 'input change blur focus input.textblocks', function( ev ) {
 
                     var $this = $( this );
                     var parent = $this.parent();
@@ -107,8 +107,9 @@
                             block = make_block( block );
                             current = ( current ) ? block.insertAfter( current ) : block.insertBefore( parent );
 
-                            var input = current.find( 'input' ).val( val );
-                            auto_size( input );
+                            var input = current.find( 'input' )
+                                .val( val )
+                                .trigger( 'input.autogrow' )
 
                             val = '';
 
@@ -117,7 +118,8 @@
                     }
 
                     // excess string blocks
-                    $this.val( val ).focus();
+                    $this.val( val );
+                    //$this.focus();
 
                 })
 
@@ -217,6 +219,9 @@
 
         // first editing block
         container.append( make_block() );
+
+        // default value
+        container.find( 'input' ).val( this.attr( 'data-value' ) ).trigger( 'input.textblocks' );
 
         // focus the last text box
         this.on( 'click', function( ev ) {

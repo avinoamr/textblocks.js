@@ -15,26 +15,20 @@
             border: 1px solid #CCC;
             border-radius: 4px;
         }
+        #container > span {
+            margin-left: 3px;
+            font-size: 12px;
+            color: #CCC;
+        }
+        #container > ul.textblocks > li > input {
+            margin-top: 4px;
+        }
         .tag {
             display: block;
             padding: 3px 5px;
             margin-bottom: 5px;
             border-radius: 4px;
             color: white;
-        }
-        .tag.blue {
-            background: blue;
-        }
-        .tag.red {
-            background: red;
-        }
-        .tag.green {
-            background: green;
-        }
-        .tag.yellow {
-            background: yellow;
-        }
-        .tag.silver {
             background: silver;
         }
 
@@ -42,7 +36,9 @@
     </head>
     <body>
 
-        <div id="container"></div>
+        <div id="container" data-value="text,blocks,awesome,tags,">
+            <span>Type a comma-separated list of tags</span>
+        </div>
 
         <script type="text/javascript" src="jquery-1.7.2.js"></script>
         <script type="text/javascript" src="textblocks.js"></script>
@@ -59,7 +55,7 @@
 
                 var blocks = [];
                 for ( var i = 0 ; i < comps.length - 1 ; i ++ ) {
-                    blocks.push( $( '<span class="tag silver">' + comps[ i ] + '</span>' ).val( comps[ i ] ) );
+                    blocks.push( $( '<span class="tag">' + comps[ i ] + '</span>' ).val( comps[ i ] ) );
                 }  
                 blocks.push( comps[ comps.length - 1 ] );
 
