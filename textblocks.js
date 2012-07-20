@@ -76,7 +76,7 @@
         var container = $( '<ul class="textblocks" />' )
             .appendTo( this );
 
-        this.append( $( '<div />' ).css( 'clear', 'both' ).hide() )
+        this.append( $( '<div />' ).css( 'clear', 'both' ) )
 
         //
         var make_block = function( element ) {
