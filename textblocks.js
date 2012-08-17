@@ -44,191 +44,207 @@
         KEY_DELETE = 46;
 
     //
-    jQuery.fn.textblocks = function( generator_fn ) {
+    var make_block = function( element, generator_fn ) {
 
-        // apply to all elements
-        var that = this;
+        // wrap the element
+        if ( element ) {
 
-        // default generator (dumb text box)
-        ( generator_fn ) || ( generator_fn = function() {} );
+            element = $( '<span />')
+                .css( 'float', 'left' )
+                .append( element );
 
-        //
-        var default_val = this.val();
-        var container = $( '<ul class="textblocks" />' )
-            .appendTo( this );
+        }
 
-        this.append( $( '<div />' ).css( 'clear', 'both' ) )
+        // create the input text box
+        var autogrow = false;
+        var text = $( '<input type="text" />')
+        .css( 'width', '3px' )
+        .css( 'min-width', '3px' )
 
-        //
-        var make_block = function( element ) {
+        // handle changes to the text input
+        .on( 'input change blur focus input.textblocks', function( ev ) {
 
-            // wrap the element
-            if ( element ) {
+            var $this = $( this );
+            var parent = $this.parent();
+            var prev = parent.prev();
+            var val = $this.val();
 
-                element = $( '<span />')
-                    .css( 'float', 'left' )
-                    .append( element );
+            autogrow = ( autogrow ) ? autogrow.trigger( 'input.autogrow' ) : $this.autoGrow( 3 );
+
+            // generate the new blocks
+            var blocks = generator_fn( val, ev );
+            if ( !blocks ) {
+                return; // no blocks created, change nothing
+            }
+            ( !$.isArray( blocks ) ) && ( blocks = [ blocks ] );
+
+            // inject the blocks to the blocks list
+            var val = '', current;
+            for ( var i = 0 ; i < blocks.length ; i ++ ) {
+
+                var block = blocks[ i ];
+                if ( "string" == typeof block || "number" == typeof block ) {
+
+                    val += block;
+
+                } else {
+
+                    block = make_block( block, generator_fn );
+                    current = ( current ) ? block.insertAfter( current ) : block.insertBefore( parent );
+
+                    var input = current.find( 'input' )
+                        .val( val )
+                        .trigger( 'input.autogrow' )
+
+                    val = '';
+
+                }
 
             }
 
-            // create the input text box
-            var autogrow = false;
-            var text = $( '<input type="text" />')
-                .css( 'width', '3px' )
-                .css( 'min-width', '3px' )
+            // excess string blocks
+            $this.val( val );
 
-                // handle changes to the text input
-                .on( 'input change blur focus input.textblocks', function( ev ) {
+        })
 
-                    var $this = $( this );
-                    var parent = $this.parent();
-                    var prev = parent.prev();
-                    var val = $this.val();
+        // handle traversal a long the block values
+        .on( 'keydown', function( ev ) {
 
-                    autogrow = ( autogrow ) ? autogrow.trigger( 'input.autogrow' ) : $this.autoGrow( 3 );
+            // get the selection data
+            var selection = $( this ).getSelection();
+            if ( selection.start != selection.end ) {
+                return; // disregard selection ranges
+            }
+            var cursor = selection.start;
+            var $this = $( this );
+            var end = $this.val().length;
 
-                    // generate the new blocks
-                    var blocks = generator_fn( val, ev );
-                    if ( !blocks ) {
-                        return; // no blocks created, change nothing
-                    }
-                    ( !$.isArray( blocks ) ) && ( blocks = [ blocks ] );
+            // move backwards (left-key)
+            if ( 0 == cursor && KEY_LEFT == ev.keyCode ) {
 
-                    // inject the blocks to the blocks list
-                    var val = '', current;
-                    for ( var i = 0 ; i < blocks.length ; i ++ ) {
+                // find and focus on text input box of the previous block
+                $this.parent().prev().find( 'input' ).focus();
 
-                        var block = blocks[ i ];
-                        if ( "string" == typeof block || "number" == typeof block ) {
+            }
 
-                            val += block;
+            // move forward (right-key)
+            if ( end == cursor && KEY_RIGHT == ev.keyCode ) {
 
-                        } else {
+                // find and focus on the text input box of the next block
+                $this.parent().next().find( 'input' ).focus();
 
-                            block = make_block( block );
-                            current = ( current ) ? block.insertAfter( current ) : block.insertBefore( parent );
+            }
 
-                            var input = current.find( 'input' )
-                                .val( val )
-                                .trigger( 'input.autogrow' )
+            // remove the previous block (backspace)
+            if ( 0 == cursor && KEY_BACKSPACE == ev.keyCode ) {
 
-                            val = '';
+                ev.preventDefault(); // this backspace shouldn't remove any characters
 
-                        }
+                var parent = $this.parent();
+                var prev = parent.prev();
 
-                    }
+                // skip if this is the first block
+                if ( !prev.length ) {
+                    return;
+                }
 
-                    // excess string blocks
-                    $this.val( val );
-                    //$this.focus();
+                prev.detach(); // remove the previous block
 
-                })
+                // read the values of the removed text box, block and the current input box
+                var text_val = prev.find( 'input' ).val();
+                var val = prev.find( 'input' ).siblings( 'span' ).children().first().val();
+                var input = parent.find( 'input' );
 
-                // handle traversal a long the block values
-                .on( 'keydown', function( ev ) {
+                // set the input value of the current block
+                input
+                    .val( text_val + val + input.val() )
+                    .setSelection( text_val.length + val.length, text_val.length + val.length )
+                    .focus();
 
-                    // get the selection data
-                    var selection = $( this ).getSelection();
-                    if ( selection.start != selection.end ) {
-                        return; // disregard selection ranges
-                    }
-                    var cursor = selection.start;
-                    var $this = $( this );
-                    var end = $this.val().length;
+            }
 
-                    // move backwards (left-key)
-                    if ( 0 == cursor && KEY_LEFT == ev.keyCode ) {
+            // remove the next block (delete)
+            if ( end == cursor && KEY_DELETE == ev.keyCode ) {
 
-                        // find and focus on text input box of the previous block
-                        $this.parent().prev().find( 'input' ).focus();
+                ev.preventDefault(); // this delete shouldn't remove any characters
 
-                    }
+                var parent = $this.parent();
+                var next = parent.next();
 
-                    // move forward (right-key)
-                    if ( end == cursor && KEY_RIGHT == ev.keyCode ) {
+                // skip if this is the last block
+                if ( !next.length ) {
+                    return;
+                }
 
-                        // find and focus on the text input box of the next block
-                        $this.parent().next().find( 'input' ).focus();
+                parent.detach(); // remove this block (practically the next)
 
-                    }
+                // read the values of the removed text box, block and the next input box
+                var text_val = $this.val();
+                var val = parent.find( 'input' ).siblings( 'span' ).children().first().val();
+                var input = next.find( 'input' );
 
-                    // remove the previous block (backspace)
-                    if ( 0 == cursor && KEY_BACKSPACE == ev.keyCode ) {
+                // set the input value of the next block
+                input
+                    .val( text_val + val + input.val() )
+                    .setSelection( text_val.length, text_val.length )
+                    .focus();
 
-                        ev.preventDefault(); // this backspace shouldn't remove any characters
+            }
 
-                        var parent = $this.parent();
-                        var prev = parent.prev();
+        });
 
-                        // skip if this is the first block
-                        if ( !prev.length ) {
-                            return;
-                        }
+        return $( '<li />' )
+            .append( text )
+            .append( element );
 
-                        prev.detach(); // remove the previous block
+    };
 
-                        // read the values of the removed text box, block and the current input box
-                        var text_val = prev.find( 'input' ).val();
-                        var val = prev.find( 'input' ).siblings( 'span' ).children().first().val();
-                        var input = parent.find( 'input' );
+    var init = function( generator_fn ) {
 
-                        // set the input value of the current block
-                        input
-                            .val( text_val + val + input.val() )
-                            .setSelection( text_val.length + val.length, text_val.length + val.length )
-                            .focus();
+        // init all of the textblocks
+        if ( this.length > 1 ) {
+            this.each(function() {
+                init.apply( arguments );
+            });
+            return this;
+        }
 
-                    }
+        // apply to all elements
+        var that = $( this );
 
-                    // remove the next block (delete)
-                    if ( end == cursor && KEY_DELETE == ev.keyCode ) {
+        //
+        var default_val = that.val();
+        var container = $( '<ul class="textblocks" />' )
+            .appendTo( that );
 
-                        ev.preventDefault(); // this delete shouldn't remove any characters
-
-                        var parent = $this.parent();
-                        var next = parent.next();
-
-                        // skip if this is the last block
-                        if ( !next.length ) {
-                            return;
-                        }
-
-                        parent.detach(); // remove this block (practically the next)
-
-                        // read the values of the removed text box, block and the next input box
-                        var text_val = $this.val();
-                        var val = parent.find( 'input' ).siblings( 'span' ).children().first().val();
-                        var input = next.find( 'input' );
-
-                        // set the input value of the next block
-                        input
-                            .val( text_val + val + input.val() )
-                            .setSelection( text_val.length, text_val.length )
-                            .focus();
-
-                    }
-
-                });
-
-            return $( '<li />' )
-                .append( text )
-                .append( element );
-
-        };
+        that.append( $( '<div />' ).css( 'clear', 'both' ) )
 
         // first editing block
-        container.append( make_block() );
+        container.append( make_block( null, generator_fn ) );
 
         // default value
         container.find( 'input' ).val( default_val ).trigger( 'input.textblocks' );
 
         // focus the last text box
-        this.on( 'click', function( ev ) {
+        that.on( 'click', function( ev ) {
             if ( ev.target != that[ 0 ] ) return true;
             container.find( 'input' ).last().focus();
         });
 
-        return this;
+        return that;
+    };
+
+    //
+    jQuery.fn.textblocks = function() {
+
+        // initialize this textblocks element once
+        if ( 0 == this.find( 'ul.textblocks' ).length ) {
+            
+            init.apply( this, arguments );
+
+        }
+
+        return this;        
 
     };
 
