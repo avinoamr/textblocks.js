@@ -49,8 +49,7 @@
         // wrap the element
         if ( element ) {
 
-            element = $( '<div class="textblock" />')
-                .css( 'float', 'left' )
+            element = $( '<div class="textblock" />' )
                 .append( element );
 
         }
