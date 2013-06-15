@@ -49,7 +49,7 @@
         // wrap the element
         if ( element ) {
 
-            element = $( '<span />')
+            element = $( '<div class="textblock" />')
                 .css( 'float', 'left' )
                 .append( element );
 
@@ -253,6 +253,7 @@
             'ul.textblocks { padding: 0; margin: 0; list-style: none; }' +
             'ul.textblocks > li { float: left; display: inline; }' + 
             'ul.textblocks > li > input { border: none; outline: none; float: left; } ' + 
+            'ul.textblocks .textblock { float: left; display: inline; }' +
         '</style>' 
     ).appendTo( $( 'head' ) );
 
