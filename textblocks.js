@@ -152,7 +152,7 @@
 
                 // read the values of the removed text box, block and the current input box
                 var text_val = prev.find( 'input' ).val();
-                var val = prev.find( 'input' ).siblings( 'span' ).children().first().val();
+                var val = prev.find( 'input' ).siblings( '.textblock' ).children().first().val();
                 var input = parent.find( 'input' );
 
                 // set the input value of the current block
@@ -180,7 +180,7 @@
 
                 // read the values of the removed text box, block and the next input box
                 var text_val = $this.val();
-                var val = parent.find( 'input' ).siblings( 'span' ).children().first().val();
+                var val = parent.find( 'input' ).siblings( '.textblock' ).children().first().val();
                 var input = next.find( 'input' );
 
                 // set the input value of the next block
@@ -269,7 +269,7 @@
 
                 var $this = $( this );
                 var text_val = $this.children( 'input' ).val();
-                var block_val = $this.children( 'span' ).children().first().val();
+                var block_val = $this.children( '.textblock' ).children().first().val();
                 
                 if ( text_val ) {
                     values.push( text_val );
